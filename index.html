@@ -59,26 +59,29 @@
       text-align: center;
     }
 
-    /* 笔记按钮 */
+    /* 打开笔记本按钮 */
     #noteBtn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
+      position: absolute;
+      left: calc(100% + 20px); /* 贴在视频右边 */
+      top: 50%;
+      transform: translateY(-50%);
       z-index: 10;
-      padding: 10px 20px;
+      padding: 16px 24px;
       background: rgba(255, 255, 255, 0.2);
       border: 2px solid white;
-      border-radius: 8px;
+      border-radius: 10px;
       color: white;
-      font-size: 1em;
+      font-size: 1.4em;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: background 0.3s, transform 0.3s;
     }
 
     #noteBtn:hover {
       background: rgba(255, 255, 255, 0.4);
+      transform: translateY(-50%) scale(1.05);
     }
 
+    /* 笔记容器 */
     #noteContainer {
       display: none;
       position: fixed;
@@ -117,23 +120,25 @@
   </style>
 </head>
 <body>
-  <!-- 验证失败 -->
+  <!-- 身份验证失败提示 -->
   <div id="unauthorized">💗宝贝不乖哦💗</div>
   <img id="retryBtn" src="retry.png" alt="重试按钮" onclick="verifyAccess()" />
 
-  <!-- 内容 -->
+  <!-- 主内容 -->
   <div id="content" style="display: none; flex-direction: column; align-items: center;">
-    <video id="myVideo" controls playsinline>
-      <source src="video.mp4" type="video/mp4">
-      您的浏览器不支持 video 标签。
-    </video>
+    <div style="position: relative; display: inline-block;">
+      <video id="myVideo" controls playsinline>
+        <source src="video.mp4" type="video/mp4">
+        您的浏览器不支持 video 标签。
+      </video>
+      <button id="noteBtn">📓 打开笔记本</button>
+    </div>
 
     <img id="replayBtn" src="replay.png" alt="再生按钮" />
     <img id="endImage" src="end.jpg" alt="End Image" />
   </div>
 
-  <!-- 笔记按钮和容器 -->
-  <button id="noteBtn">📓 打开笔记本</button>
+  <!-- 笔记容器 -->
   <div id="noteContainer">
     <textarea id="noteArea" placeholder="写点什么吧..."></textarea>
     <button id="saveNoteBtn">💾 保存</button>
@@ -156,7 +161,7 @@
 
     document.addEventListener("DOMContentLoaded", verifyAccess);
 
-    // 视频控制
+    // 视频播放控制
     const video = document.getElementById('myVideo');
     const endImage = document.getElementById('endImage');
     const replayBtn = document.getElementById('replayBtn');
@@ -181,13 +186,13 @@
       video.classList.remove('shrink');
     });
 
-    // 笔记本功能
+    // 笔记功能
     const noteBtn = document.getElementById('noteBtn');
     const noteContainer = document.getElementById('noteContainer');
     const noteArea = document.getElementById('noteArea');
     const saveNoteBtn = document.getElementById('saveNoteBtn');
 
-    // 加载已保存的内容
+    // 读取保存的笔记
     noteArea.value = localStorage.getItem('myNote') || '';
 
     // 打开/关闭笔记本
@@ -195,7 +200,7 @@
       noteContainer.style.display = noteContainer.style.display === 'none' ? 'block' : 'none';
     });
 
-    // 保存内容
+    // 保存笔记
     saveNoteBtn.addEventListener('click', () => {
       localStorage.setItem('myNote', noteArea.value);
       alert('笔记已保存！');
