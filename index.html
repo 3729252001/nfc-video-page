@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>视频展示（图片按钮+笔记本）</title>
+  <title>视频展示 + 外部笔记本</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -59,10 +59,9 @@
       text-align: center;
     }
 
-    /* 打开笔记本按钮 */
     #noteBtn {
       position: absolute;
-      left: calc(100% + 20px); /* 贴在视频右边 */
+      left: calc(100% + 20px);
       top: 50%;
       transform: translateY(-50%);
       z-index: 10;
@@ -81,7 +80,6 @@
       transform: translateY(-50%) scale(1.05);
     }
 
-    /* 笔记容器 */
     #noteContainer {
       display: none;
       position: fixed;
@@ -120,32 +118,28 @@
   </style>
 </head>
 <body>
-  <!-- 身份验证失败提示 -->
   <div id="unauthorized">💗宝贝不乖哦💗</div>
   <img id="retryBtn" src="retry.png" alt="重试按钮" onclick="verifyAccess()" />
 
-  <!-- 主内容 -->
   <div id="content" style="display: none; flex-direction: column; align-items: center;">
     <div style="position: relative; display: inline-block;">
       <video id="myVideo" controls playsinline>
         <source src="video.mp4" type="video/mp4">
         您的浏览器不支持 video 标签。
       </video>
-      <button id="noteBtn">📓 Node</button>
+      <button id="noteBtn">📓 打开笔记本</button>
     </div>
 
     <img id="replayBtn" src="replay.png" alt="再生按钮" />
     <img id="endImage" src="end.jpg" alt="End Image" />
   </div>
 
-  <!-- 笔记容器 -->
   <div id="noteContainer">
-    <textarea id="noteArea" placeholder="写点什么吧..."></textarea>
+    <textarea id="noteArea" placeholder="正在加载笔记内容..."></textarea>
     <button id="saveNoteBtn">💾 保存</button>
   </div>
 
   <script>
-    // 身份验证
     function verifyAccess() {
       const answer = prompt("💗叫老公💗");
       if (answer && answer.trim().toLowerCase() === "老公") {
@@ -161,7 +155,6 @@
 
     document.addEventListener("DOMContentLoaded", verifyAccess);
 
-    // 视频播放控制
     const video = document.getElementById('myVideo');
     const endImage = document.getElementById('endImage');
     const replayBtn = document.getElementById('replayBtn');
@@ -186,24 +179,32 @@
       video.classList.remove('shrink');
     });
 
-    // 笔记功能
+    // 笔记本
     const noteBtn = document.getElementById('noteBtn');
     const noteContainer = document.getElementById('noteContainer');
     const noteArea = document.getElementById('noteArea');
     const saveNoteBtn = document.getElementById('saveNoteBtn');
 
-    // 读取保存的笔记
-    noteArea.value = localStorage.getItem('myNote') || '';
-
-    // 打开/关闭笔记本
     noteBtn.addEventListener('click', () => {
       noteContainer.style.display = noteContainer.style.display === 'none' ? 'block' : 'none';
     });
 
-    // 保存笔记
+    // 从 note.txt 加载内容
+    fetch('note.txt')
+      .then(response => {
+        if (!response.ok) throw new Error("加载失败");
+        return response.text();
+      })
+      .then(data => {
+        noteArea.value = data;
+      })
+      .catch(err => {
+        noteArea.value = "⚠️ 无法加载笔记内容，请确保 note.txt 与 index.html 在同一目录下。";
+      });
+
+    // 保存按钮（可选，仅提示）
     saveNoteBtn.addEventListener('click', () => {
-      localStorage.setItem('myNote', noteArea.value);
-      alert('笔记已保存！');
+      alert("此笔记内容来自 note.txt，仅可查看。如需修改请直接编辑该文件。");
     });
   </script>
 </body>
