@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>视频展示（图片按钮）</title>
+  <title>视频展示（图片按钮+笔记本）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -18,6 +17,7 @@
       color: white;
       font-family: Arial, sans-serif;
     }
+
     video {
       width: 100%;
       max-width: 960px;
@@ -27,9 +27,11 @@
       border-radius: 10px;
       background: black;
     }
+
     video.shrink {
       transform: scale(0.5);
     }
+
     #endImage {
       display: none;
       margin-top: -10px;
@@ -37,6 +39,7 @@
       border: 2px solid #fff;
       border-radius: 10px;
     }
+
     #replayBtn, #retryBtn {
       display: none;
       margin-top: -10px;
@@ -44,17 +47,100 @@
       max-width: 180px;
       transition: transform 0.3s ease;
     }
+
     #replayBtn:hover, #retryBtn:hover {
       transform: scale(1.1);
     }
+
     #unauthorized {
       display: none;
       font-size: 2em;
       text-shadow: 2px 2px 5px black;
       text-align: center;
     }
+
+    /* 笔记按钮 */
+    #noteBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid white;
+      border-radius: 8px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #noteBtn:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    #noteContainer {
+      display: none;
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      width: 300px;
+      height: 400px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid white;
+      border-radius: 10px;
+      padding: 10px;
+      z-index: 10;
+    }
+
+    #noteArea {
+      width: 100%;
+      height: 300px;
+      background: white;
+      color: black;
+      padding: 10px;
+      border-radius: 6px;
+      resize: none;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
+
+    #saveNoteBtn {
+      margin-top: 10px;
+      width: 100%;
+      padding: 8px;
+      font-size: 1em;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
   </style>
+</head>
+<body>
+  <!-- 验证失败 -->
+  <div id="unauthorized">💗宝贝不乖哦💗</div>
+  <img id="retryBtn" src="retry.png" alt="重试按钮" onclick="verifyAccess()" />
+
+  <!-- 内容 -->
+  <div id="content" style="display: none; flex-direction: column; align-items: center;">
+    <video id="myVideo" controls playsinline>
+      <source src="video.mp4" type="video/mp4">
+      您的浏览器不支持 video 标签。
+    </video>
+
+    <img id="replayBtn" src="replay.png" alt="再生按钮" />
+    <img id="endImage" src="end.jpg" alt="End Image" />
+  </div>
+
+  <!-- 笔记按钮和容器 -->
+  <button id="noteBtn">📓 打开笔记本</button>
+  <div id="noteContainer">
+    <textarea id="noteArea" placeholder="写点什么吧..."></textarea>
+    <button id="saveNoteBtn">💾 保存</button>
+  </div>
+
   <script>
+    // 身份验证
     function verifyAccess() {
       const answer = prompt("💗叫老公💗");
       if (answer && answer.trim().toLowerCase() === "老公") {
@@ -69,23 +155,8 @@
     }
 
     document.addEventListener("DOMContentLoaded", verifyAccess);
-  </script>
-</head>
-<body>
-  <div id="unauthorized">💗宝贝不乖哦💗</div>
-  <img id="retryBtn" src="retry.png" alt="重试按钮" onclick="verifyAccess()" />
 
-  <div id="content" style="display: none; flex-direction: column; align-items: center;">
-    <video id="myVideo" controls playsinline>
-      <source src="video.mp4" type="video/mp4">
-      您的浏览器不支持 video 标签。
-    </video>
-
-    <img id="replayBtn" src="replay.png" alt="再生按钮" />
-    <img id="endImage" src="end.jpg" alt="End Image" />
-  </div>
-
-  <script>
+    // 视频控制
     const video = document.getElementById('myVideo');
     const endImage = document.getElementById('endImage');
     const replayBtn = document.getElementById('replayBtn');
@@ -108,6 +179,26 @@
       replayBtn.style.display = 'none';
       endImage.style.display = 'none';
       video.classList.remove('shrink');
+    });
+
+    // 笔记本功能
+    const noteBtn = document.getElementById('noteBtn');
+    const noteContainer = document.getElementById('noteContainer');
+    const noteArea = document.getElementById('noteArea');
+    const saveNoteBtn = document.getElementById('saveNoteBtn');
+
+    // 加载已保存的内容
+    noteArea.value = localStorage.getItem('myNote') || '';
+
+    // 打开/关闭笔记本
+    noteBtn.addEventListener('click', () => {
+      noteContainer.style.display = noteContainer.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // 保存内容
+    saveNoteBtn.addEventListener('click', () => {
+      localStorage.setItem('myNote', noteArea.value);
+      alert('笔记已保存！');
     });
   </script>
 </body>
