@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>视频展示 + 外部笔记本</title>
+  <title>视频展示 + 按钮笔记本</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -59,6 +59,7 @@
       text-align: center;
     }
 
+    /* 打开笔记本按钮：固定在视频右侧中间 */
     #noteBtn {
       position: absolute;
       left: calc(100% + 20px);
@@ -80,23 +81,23 @@
       transform: translateY(-50%) scale(1.05);
     }
 
+    /* 笔记本容器：点击按钮后出现，居中显示在视频下方 */
     #noteContainer {
       display: none;
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      width: 300px;
-      height: 400px;
-      background: rgba(0, 0, 0, 0.7);
+      position: relative;
+      margin-top: 20px;
+      width: 400px;
+      height: 350px;
+      background: rgba(0, 0, 0, 0.8);
       border: 2px solid white;
-      border-radius: 10px;
-      padding: 10px;
+      border-radius: 12px;
+      padding: 15px;
       z-index: 10;
     }
 
     #noteArea {
       width: 100%;
-      height: 300px;
+      height: 270px;
       background: white;
       color: black;
       padding: 10px;
@@ -109,7 +110,7 @@
     #saveNoteBtn {
       margin-top: 10px;
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       font-size: 1em;
       border: none;
       border-radius: 6px;
@@ -118,28 +119,33 @@
   </style>
 </head>
 <body>
+  <!-- 验证失败提示 -->
   <div id="unauthorized">💗宝贝不乖哦💗</div>
   <img id="retryBtn" src="retry.png" alt="重试按钮" onclick="verifyAccess()" />
 
+  <!-- 视频和按钮 -->
   <div id="content" style="display: none; flex-direction: column; align-items: center;">
     <div style="position: relative; display: inline-block;">
       <video id="myVideo" controls playsinline>
         <source src="video.mp4" type="video/mp4">
         您的浏览器不支持 video 标签。
       </video>
-      <button id="noteBtn">📓 亡妻回忆录</button>
+      <button id="noteBtn">📓 打开笔记本</button>
     </div>
 
+    <!-- 结尾图片和重播按钮 -->
     <img id="replayBtn" src="replay.png" alt="再生按钮" />
     <img id="endImage" src="end.jpg" alt="End Image" />
-  </div>
 
-  <div id="noteContainer">
-    <textarea id="noteArea" placeholder="正在加载笔记内容..."></textarea>
-    <button id="saveNoteBtn">💾 保存</button>
+    <!-- 笔记本 -->
+    <div id="noteContainer">
+      <textarea id="noteArea" placeholder="正在加载笔记内容..."></textarea>
+      <button id="saveNoteBtn">💾 保存</button>
+    </div>
   </div>
 
   <script>
+    // 访问验证
     function verifyAccess() {
       const answer = prompt("💗叫老公💗");
       if (answer && answer.trim().toLowerCase() === "老公") {
@@ -158,7 +164,11 @@
     const video = document.getElementById('myVideo');
     const endImage = document.getElementById('endImage');
     const replayBtn = document.getElementById('replayBtn');
+    const noteBtn = document.getElementById('noteBtn');
+    const noteContainer = document.getElementById('noteContainer');
+    const noteArea = document.getElementById('noteArea');
 
+    // 视频播放逻辑
     video.addEventListener('ended', () => {
       video.classList.add('shrink');
       endImage.style.display = 'block';
@@ -179,12 +189,7 @@
       video.classList.remove('shrink');
     });
 
-    // 笔记本
-    const noteBtn = document.getElementById('noteBtn');
-    const noteContainer = document.getElementById('noteContainer');
-    const noteArea = document.getElementById('noteArea');
-    const saveNoteBtn = document.getElementById('saveNoteBtn');
-
+    // 按钮控制笔记本显示/隐藏
     noteBtn.addEventListener('click', () => {
       noteContainer.style.display = noteContainer.style.display === 'none' ? 'block' : 'none';
     });
@@ -199,12 +204,12 @@
         noteArea.value = data;
       })
       .catch(err => {
-        noteArea.value = "⚠️ 无法加载笔记内容";
+        noteArea.value = "⚠️ 无法加载笔记内容，请确保 note.txt 与 index.html 在同一目录。";
       });
 
-    // 保存按钮（可选，仅提示）
-    saveNoteBtn.addEventListener('click', () => {
-      alert("这是我的笔记本，你写不了！");
+    // 保存提示
+    document.getElementById('saveNoteBtn').addEventListener('click', () => {
+      alert("此笔记内容来自 note.txt，仅可查看。如需修改请直接编辑该文件。");
     });
   </script>
 </body>
