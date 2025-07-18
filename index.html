@@ -59,19 +59,23 @@
       text-align: center;
     }
 
-    /* 打开笔记本按钮：固定在视频右侧中间 */
+    /* 打开笔记本按钮（大方框可点） */
     #noteBtn {
       position: absolute;
       left: calc(100% + 20px);
       top: 50%;
       transform: translateY(-50%);
       z-index: 10;
-      padding: 16px 24px;
+      width: 160px;
+      height: 80px;
       background: rgba(255, 255, 255, 0.2);
       border: 2px solid white;
       border-radius: 10px;
       color: white;
       font-size: 1.4em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
       transition: background 0.3s, transform 0.3s;
     }
@@ -81,7 +85,7 @@
       transform: translateY(-50%) scale(1.05);
     }
 
-    /* 笔记本容器：点击按钮后出现，居中显示在视频下方 */
+    /* 笔记本容器 */
     #noteContainer {
       display: none;
       position: relative;
@@ -107,13 +111,14 @@
       box-sizing: border-box;
     }
 
-    #saveNoteBtn {
+    #closeNoteBtn {
       margin-top: 10px;
       width: 100%;
       padding: 10px;
       font-size: 1em;
       border: none;
       border-radius: 6px;
+      background: rgba(255, 255, 255, 0.8);
       cursor: pointer;
     }
   </style>
@@ -130,7 +135,8 @@
         <source src="video.mp4" type="video/mp4">
         您的浏览器不支持 video 标签。
       </video>
-      <button id="noteBtn">📓 打开笔记本</button>
+      <!-- 大范围可点击的按钮 -->
+      <button id="noteBtn">📓 笔记本</button>
     </div>
 
     <!-- 结尾图片和重播按钮 -->
@@ -140,12 +146,12 @@
     <!-- 笔记本 -->
     <div id="noteContainer">
       <textarea id="noteArea" placeholder="正在加载笔记内容..."></textarea>
-      <button id="saveNoteBtn">💾 保存</button>
+      <button id="closeNoteBtn">✖ 关闭</button>
     </div>
   </div>
 
   <script>
-    // 访问验证
+    // 验证访问
     function verifyAccess() {
       const answer = prompt("💗叫老公💗");
       if (answer && answer.trim().toLowerCase() === "老公") {
@@ -167,6 +173,7 @@
     const noteBtn = document.getElementById('noteBtn');
     const noteContainer = document.getElementById('noteContainer');
     const noteArea = document.getElementById('noteArea');
+    const closeNoteBtn = document.getElementById('closeNoteBtn');
 
     // 视频播放逻辑
     video.addEventListener('ended', () => {
@@ -179,6 +186,7 @@
       video.classList.remove('shrink');
       endImage.style.display = 'none';
       replayBtn.style.display = 'none';
+      noteContainer.style.display = 'none';
       video.currentTime = 0;
       video.play();
     });
@@ -186,15 +194,21 @@
     video.addEventListener('play', () => {
       replayBtn.style.display = 'none';
       endImage.style.display = 'none';
+      noteContainer.style.display = 'none';
       video.classList.remove('shrink');
     });
 
-    // 按钮控制笔记本显示/隐藏
+    // 点击按钮显示/隐藏笔记本
     noteBtn.addEventListener('click', () => {
       noteContainer.style.display = noteContainer.style.display === 'none' ? 'block' : 'none';
     });
 
-    // 从 note.txt 加载内容
+    // 点击关闭按钮隐藏笔记本
+    closeNoteBtn.addEventListener('click', () => {
+      noteContainer.style.display = 'none';
+    });
+
+    // 加载 note.txt 内容
     fetch('note.txt')
       .then(response => {
         if (!response.ok) throw new Error("加载失败");
@@ -206,11 +220,6 @@
       .catch(err => {
         noteArea.value = "⚠️ 无法加载笔记内容，请确保 note.txt 与 index.html 在同一目录。";
       });
-
-    // 保存提示
-    document.getElementById('saveNoteBtn').addEventListener('click', () => {
-      alert("此笔记内容来自 note.txt，仅可查看。如需修改请直接编辑该文件。");
-    });
   </script>
 </body>
 </html>
