@@ -42,10 +42,10 @@
 
     #replayBtn, #retryBtn {
       display: none;
-      margin-top: -10px;
       cursor: pointer;
       max-width: 180px;
       transition: transform 0.3s ease;
+      margin-top: 10px;
     }
 
     #replayBtn:hover, #retryBtn:hover {
@@ -59,15 +59,12 @@
       text-align: center;
     }
 
-    /* 笔记本按钮：电脑端右侧，手机端自动居中 */
+    /* 笔记本按钮：始终和 replay 按钮一样居中，显示在 replay 上方 */
     #noteBtn {
-      position: absolute;
-      left: calc(100% + 20px);
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 10;
-      width: 160px;
-      height: 80px;
+      display: none;             /* 初始隐藏，和 replay 一样逻辑 */
+      cursor: pointer;
+      max-width: 200px;
+      height: 70px;
       background: rgba(255, 255, 255, 0.3);
       border: 2px solid white;
       border-radius: 10px;
@@ -77,26 +74,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
+      margin: 10px auto;         /* 水平居中 */
       transition: background 0.3s, transform 0.3s;
     }
 
     #noteBtn:hover {
       background: rgba(255, 255, 255, 0.5);
-      transform: translateY(-50%) scale(1.05);
-    }
-
-    /* 手机/平板：按钮移到视频下方并水平居中，像 replay 按钮 */
-    @media (max-width: 768px) {
-      #noteBtn {
-        position: static;
-        margin: 15px auto 0 auto;
-        transform: none;
-        display: block;
-        width: 70%;
-        height: 60px;
-        font-size: 1.2em;
-      }
+      transform: scale(1.05);
     }
 
     /* 笔记本容器 */
@@ -144,20 +128,19 @@
 
   <!-- 主内容 -->
   <div id="content" style="display: none; flex-direction: column; align-items: center;">
-    <div style="position: relative; display: inline-block;">
-      <video id="myVideo" controls playsinline>
-        <source src="video.mp4" type="video/mp4">
-        您的浏览器不支持 video 标签。
-      </video>
-      <!-- 打开笔记本按钮 -->
-      <button id="noteBtn">📓 笔记本</button>
-    </div>
+    <video id="myVideo" controls playsinline>
+      <source src="video.mp4" type="video/mp4">
+      您的浏览器不支持 video 标签。
+    </video>
 
-    <!-- 视频结束显示的图片和重播按钮 -->
-    <img id="replayBtn" src="replay.png" alt="再生按钮" />
+    <!-- 结束画面 -->
     <img id="endImage" src="end.jpg" alt="End Image" />
 
-    <!-- 笔记本容器 -->
+    <!-- 笔记本按钮和重播按钮（居中堆叠） -->
+    <button id="noteBtn">📓 笔记本</button>
+    <img id="replayBtn" src="replay.png" alt="再生按钮" />
+
+    <!-- 笔记本 -->
     <div id="noteContainer">
       <textarea id="noteArea" placeholder="正在加载笔记内容..."></textarea>
       <button id="closeNoteBtn">✖ 关闭</button>
@@ -165,7 +148,7 @@
   </div>
 
   <script>
-    // 访问验证
+    // 身份验证
     function verifyAccess() {
       const answer = prompt("💗叫老公💗");
       if (answer && answer.trim().toLowerCase() === "老公") {
@@ -189,42 +172,45 @@
     const noteArea = document.getElementById('noteArea');
     const closeNoteBtn = document.getElementById('closeNoteBtn');
 
-    // 视频播放结束逻辑
+    // 视频结束时显示 replay 和 note 按钮
     video.addEventListener('ended', () => {
       video.classList.add('shrink');
       endImage.style.display = 'block';
       replayBtn.style.display = 'block';
+      noteBtn.style.display = 'block';
     });
 
-    // 重播按钮
+    // 重播视频
     replayBtn.addEventListener('click', () => {
       video.classList.remove('shrink');
       endImage.style.display = 'none';
       replayBtn.style.display = 'none';
+      noteBtn.style.display = 'none';
       noteContainer.style.display = 'none';
       video.currentTime = 0;
       video.play();
     });
 
-    // 播放时隐藏其他元素
+    // 播放时隐藏 replay 和 note 按钮
     video.addEventListener('play', () => {
       replayBtn.style.display = 'none';
+      noteBtn.style.display = 'none';
       endImage.style.display = 'none';
       noteContainer.style.display = 'none';
       video.classList.remove('shrink');
     });
 
-    // 笔记本按钮显示/隐藏笔记本
+    // 笔记本按钮控制
     noteBtn.addEventListener('click', () => {
       noteContainer.style.display = noteContainer.style.display === 'none' ? 'block' : 'none';
     });
 
-    // 关闭按钮隐藏笔记本
+    // 关闭笔记本
     closeNoteBtn.addEventListener('click', () => {
       noteContainer.style.display = 'none';
     });
 
-    // 加载 note.txt 内容
+    // 从 note.txt 加载内容
     fetch('note.txt')
       .then(response => {
         if (!response.ok) throw new Error("加载失败");
