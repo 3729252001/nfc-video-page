@@ -59,7 +59,7 @@
       text-align: center;
     }
 
-    /* 打开笔记本按钮：电脑端在视频右侧，手机端自动到下方 */
+    /* 笔记本按钮：电脑端右侧，手机端自动居中 */
     #noteBtn {
       position: absolute;
       left: calc(100% + 20px);
@@ -86,12 +86,13 @@
       transform: translateY(-50%) scale(1.05);
     }
 
-    /* 手机/平板：按钮放到视频下方居中 */
+    /* 手机/平板：按钮移到视频下方并水平居中，像 replay 按钮 */
     @media (max-width: 768px) {
       #noteBtn {
         position: static;
-        margin-top: 15px;
+        margin: 15px auto 0 auto;
         transform: none;
+        display: block;
         width: 70%;
         height: 60px;
         font-size: 1.2em;
@@ -137,25 +138,26 @@
   </style>
 </head>
 <body>
-  <!-- 验证失败提示 -->
+  <!-- 身份验证提示 -->
   <div id="unauthorized">💗宝贝不乖哦💗</div>
   <img id="retryBtn" src="retry.png" alt="重试按钮" onclick="verifyAccess()" />
 
-  <!-- 视频和按钮 -->
+  <!-- 主内容 -->
   <div id="content" style="display: none; flex-direction: column; align-items: center;">
     <div style="position: relative; display: inline-block;">
       <video id="myVideo" controls playsinline>
         <source src="video.mp4" type="video/mp4">
         您的浏览器不支持 video 标签。
       </video>
+      <!-- 打开笔记本按钮 -->
       <button id="noteBtn">📓 笔记本</button>
     </div>
 
-    <!-- 结尾图片和重播按钮 -->
+    <!-- 视频结束显示的图片和重播按钮 -->
     <img id="replayBtn" src="replay.png" alt="再生按钮" />
     <img id="endImage" src="end.jpg" alt="End Image" />
 
-    <!-- 笔记本 -->
+    <!-- 笔记本容器 -->
     <div id="noteContainer">
       <textarea id="noteArea" placeholder="正在加载笔记内容..."></textarea>
       <button id="closeNoteBtn">✖ 关闭</button>
@@ -163,7 +165,7 @@
   </div>
 
   <script>
-    // 验证访问
+    // 访问验证
     function verifyAccess() {
       const answer = prompt("💗叫老公💗");
       if (answer && answer.trim().toLowerCase() === "老公") {
@@ -187,13 +189,14 @@
     const noteArea = document.getElementById('noteArea');
     const closeNoteBtn = document.getElementById('closeNoteBtn');
 
-    // 视频播放逻辑
+    // 视频播放结束逻辑
     video.addEventListener('ended', () => {
       video.classList.add('shrink');
       endImage.style.display = 'block';
       replayBtn.style.display = 'block';
     });
 
+    // 重播按钮
     replayBtn.addEventListener('click', () => {
       video.classList.remove('shrink');
       endImage.style.display = 'none';
@@ -203,6 +206,7 @@
       video.play();
     });
 
+    // 播放时隐藏其他元素
     video.addEventListener('play', () => {
       replayBtn.style.display = 'none';
       endImage.style.display = 'none';
@@ -210,7 +214,7 @@
       video.classList.remove('shrink');
     });
 
-    // 按钮控制笔记本显示/隐藏
+    // 笔记本按钮显示/隐藏笔记本
     noteBtn.addEventListener('click', () => {
       noteContainer.style.display = noteContainer.style.display === 'none' ? 'block' : 'none';
     });
@@ -220,7 +224,7 @@
       noteContainer.style.display = 'none';
     });
 
-    // 从 note.txt 加载内容
+    // 加载 note.txt 内容
     fetch('note.txt')
       .then(response => {
         if (!response.ok) throw new Error("加载失败");
